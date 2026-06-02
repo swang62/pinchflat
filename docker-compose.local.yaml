@@ -1,0 +1,32 @@
+services:
+  pinchflat:
+    container_name: pinchflat
+    image: swang62/pinchflat:latest
+    build:
+      context: .
+      dockerfile: ./docker/selfhosted.Dockerfile
+    restart: unless-stopped
+    expose:
+      - 8945
+    volumes:
+      - C:/dev/databases/pinchflat:/config
+      - F:/Videos:/downloads/videos
+      - H:/Navidrome/music:/downloads/music
+      - C:/Users/steve/AppData/Roaming/Floorp/Profiles/ibqugwht.default-release/cookies.sqlite:/root/.config/mozilla/firefox/default/cookies.sqlite
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      - caddy
+    labels:
+      caddy: pinchflat.supersteve.lan
+      caddy.reverse_proxy: pinchflat:8945
+    healthcheck:
+      test: curl -s http://localhost:8945/healthcheck || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+networks:
+  caddy:
+    external: true
