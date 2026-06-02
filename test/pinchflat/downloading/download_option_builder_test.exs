@@ -334,15 +334,6 @@ defmodule Pinchflat.Downloading.DownloadOptionBuilderTest do
       {:ok, %{base_dir: base_dir}}
     end
 
-    test "includes base config file if it's present", %{media_item: media_item, base_dir: base_dir} do
-      filepath = Path.join(base_dir, "base-config.txt")
-
-      FilesystemUtils.write_p!(filepath, "base config")
-
-      assert {:ok, res} = DownloadOptionBuilder.build(media_item)
-      assert {:config_locations, filepath} in res
-    end
-
     test "includes media profile config file if it's present", %{media_item: media_item, base_dir: base_dir} do
       media_profile = media_item.source.media_profile
       filepath = Path.join(base_dir, "media-profile-#{media_profile.id}-config.txt")
@@ -378,8 +369,9 @@ defmodule Pinchflat.Downloading.DownloadOptionBuilderTest do
       refute :config_locations in res
     end
 
-    test "does not return a config file if it's blank", %{media_item: media_item, base_dir: base_dir} do
-      filepath = Path.join(base_dir, "base-config.txt")
+    test "does not return a profile config file if it's blank", %{media_item: media_item, base_dir: base_dir} do
+      media_profile = media_item.source.media_profile
+      filepath = Path.join(base_dir, "media-profile-#{media_profile.id}-config.txt")
 
       FilesystemUtils.write_p!(filepath, " \n \n ")
 
@@ -391,12 +383,10 @@ defmodule Pinchflat.Downloading.DownloadOptionBuilderTest do
       source = media_item.source
       media_profile = source.media_profile
 
-      base_filepath = Path.join(base_dir, "base-config.txt")
       source_filepath = Path.join(base_dir, "source-#{source.id}-config.txt")
       media_item_filepath = Path.join(base_dir, "media-item-#{media_item.id}-config.txt")
       media_profile_filepath = Path.join(base_dir, "media-profile-#{media_profile.id}-config.txt")
 
-      FilesystemUtils.write_p!(base_filepath, "config")
       FilesystemUtils.write_p!(source_filepath, "config")
       FilesystemUtils.write_p!(media_item_filepath, "config")
       FilesystemUtils.write_p!(media_profile_filepath, "config")
@@ -404,7 +394,6 @@ defmodule Pinchflat.Downloading.DownloadOptionBuilderTest do
       assert {:ok, res} = DownloadOptionBuilder.build(media_item)
 
       expected_order = [
-        {:config_locations, base_filepath},
         {:config_locations, media_profile_filepath},
         {:config_locations, source_filepath},
         {:config_locations, media_item_filepath}

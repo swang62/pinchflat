@@ -157,17 +157,15 @@ defmodule Pinchflat.Downloading.DownloadOptionBuilder do
     end
   end
 
-  # This is put here instead of the CommandRunner module because it should only
-  # be applied to downloading - if it were in CommandRunner it would apply to
-  # all yt-dlp commands (like indexing)
+  # NOTE: base-config.txt is handled globally in CommandRunner. Only
+  # media-item, source, and media-profile configs are applied here.
   defp config_file_options(media_item) do
     base_dir = Path.join(Application.get_env(:pinchflat, :extras_directory), "yt-dlp-configs")
     # Ordered by priority - the first file has the highest priority
     filenames = [
       "media-item-#{media_item.id}-config.txt",
       "source-#{media_item.source_id}-config.txt",
-      "media-profile-#{media_item.source.media_profile_id}-config.txt",
-      "base-config.txt"
+      "media-profile-#{media_item.source.media_profile_id}-config.txt"
     ]
 
     config_filepaths =

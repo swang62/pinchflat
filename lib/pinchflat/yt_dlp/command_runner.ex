@@ -37,7 +37,7 @@ defmodule Pinchflat.YtDlp.CommandRunner do
     print_to_file_opts = [{:print_to_file, output_template}, output_filepath]
     user_configured_opts = cookie_file_options(addl_opts) ++ rate_limit_options(addl_opts) ++ misc_options()
     # These must stay in exactly this order, hence why I'm giving it its own variable.
-    all_opts = command_opts ++ print_to_file_opts ++ user_configured_opts ++ global_options()
+    all_opts = command_opts ++ print_to_file_opts ++ user_configured_opts ++ config_file_options() ++ global_options()
     formatted_command_opts = [url] ++ CliUtils.parse_options(all_opts)
 
     case CliUtils.wrap_cmd(backend_executable(), formatted_command_opts, stderr_to_stdout: true) do
@@ -150,6 +150,19 @@ defmodule Pinchflat.YtDlp.CommandRunner do
         sleep_interval: NumberUtils.add_jitter(sleep_interval),
         sleep_subtitles: NumberUtils.add_jitter(sleep_interval)
       ]
+    end
+  end
+
+  # Applies base-config.txt to ALL yt-dlp calls (not just downloads).
+  # Media-item/source/profile-specific configs are handled in DownloadOptionBuilder.
+  defp config_file_options do
+    base_dir = Path.join(Application.get_env(:pinchflat, :extras_directory), "yt-dlp-configs")
+    filepath = Path.join(base_dir, "base-config.txt")
+
+    if FSUtils.exists_and_nonempty?(filepath) do
+      [{:config_locations, filepath}]
+    else
+      []
     end
   end
 

@@ -94,6 +94,32 @@ defmodule Pinchflat.YtDlp.CommandRunnerTest do
       # Cleanup
       FilesystemUtils.write_p!(cookie_file, "")
     end
+
+    test "includes base-config.txt when it exists", %{yt_dlp_file: yt_dlp_file} do
+      base_dir = Path.join(Application.get_env(:pinchflat, :extras_directory), "yt-dlp-configs")
+      base_config = Path.join(base_dir, "base-config.txt")
+
+      FilesystemUtils.write_p!(base_config, "some config")
+
+      assert {:ok, output} = Runner.run(@media_url, :foo, [], "")
+
+      assert String.contains?(output, "--config-locations #{base_config}")
+
+      File.rm(base_config)
+    end
+
+    test "doesn't include --config-locations when base-config.txt doesn't exist" do
+      base_dir = Path.join(Application.get_env(:pinchflat, :extras_directory), "yt-dlp-configs")
+      base_config = Path.join(base_dir, "base-config.txt")
+
+      File.rm(base_config)
+
+      assert {:ok, output} = Runner.run(@media_url, :foo, [], "")
+
+      refute String.contains?(output, "--config-locations")
+
+      FilesystemUtils.write_p!(base_config, "")
+    end
   end
 
   describe "run/4 when testing rate limit options" do
