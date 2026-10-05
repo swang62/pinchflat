@@ -9,17 +9,17 @@ services:
     expose:
       - 8945
     volumes:
-      - C:/dev/databases/pinchflat:/config
+      - /c/dev/databases/pinchflat:/config
       - F:/Videos:/downloads/videos
       - H:/Navidrome/music:/downloads/music
-      - C:/Users/steve/AppData/Roaming/Floorp/Profiles/ibqugwht.default-release/cookies.sqlite:/root/.config/mozilla/firefox/default/cookies.sqlite
+      - /c/Users/steve/AppData/Roaming/Floorp/Profiles/ibqugwht.default-release/cookies.sqlite:/root/.config/mozilla/firefox/default/cookies.sqlite
     environment:
       - TZ=Asia/Shanghai
     networks:
       - caddy
     labels:
       caddy: pinchflat.supersteve.lan
-      caddy.reverse_proxy: pinchflat:8945
+      caddy.reverse_proxy: '{{ upstreams 8945 }}'
     healthcheck:
       test: curl -s http://localhost:8945/healthcheck || exit 1
       interval: 1m
