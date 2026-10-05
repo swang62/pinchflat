@@ -10,8 +10,8 @@ services:
       - 8945
     volumes:
       - /c/dev/databases/pinchflat:/config
-      - F:/Videos:/downloads/videos
-      - H:/Navidrome/music:/downloads/music
+      - /f/Videos:/downloads/videos
+      - /h/Navidrome/music:/downloads/music
       - /c/Users/steve/AppData/Roaming/Floorp/Profiles/ibqugwht.default-release/cookies.sqlite:/root/.config/mozilla/firefox/default/cookies.sqlite
     environment:
       - TZ=Asia/Shanghai
